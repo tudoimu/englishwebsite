@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>IELTS Buddy - Luyện IELTS mỗi ngày</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFB6C1">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=3">
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="topbar">
+    <div class="brand">IELTS Buddy 🐣</div>
+    <div style="display:flex; gap:8px;">
+      <button id="navbarInstallBtn" class="icon-btn hidden" title="Cài đặt app">⬇️</button>
+      <button id="darkModeBtn" class="icon-btn" title="Đổi giao diện">🌙</button>
+    </div>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section id="screen-home" class="screen">
+    <div class="hero-card">
+      <div class="streak" id="heroStreak">🔥 0 ngày streak</div>
+      <div class="sub" id="heroProgressText">0/0 từ vựng đã học</div>
+      <div class="progress-bar"><div class="progress-bar-fill" id="heroProgressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="card" id="questCard">
+      <div class="chip" id="questLabel">NHIỆM VỤ HÔM NAY</div>
+      <h3 id="questTitle" class="mt-8" style="font-size:18px;"></h3>
+      <p id="questSub" class="mt-8" style="color:var(--text-light); font-size:13px;"></p>
+      <button class="btn btn-primary mt-16" id="questBtn">Bắt đầu</button>
+    </div>
+
+    <div class="ticker" id="tipsTicker">
+      <div class="ticker-track" id="tipsTickerTrack"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="homeSearchInput" class="typing-input" style="text-align:left; font-size:14px; font-weight:600;" placeholder="🔍 Nhập từ vựng cần tra cứu...">
+      </div>
+      <div id="homeSearchResults" class="mt-8"></div>
+    </div>
+
+    <div class="module-grid">
+      <div class="module-tile" data-screen="screen-vocab-topics">
+        <span class="emoji">📖</span>
+        <div class="title">Từ vựng</div>
+        <div class="desc">Flashcard theo chủ đề</div>
+      </div>
+      <div class="module-tile" data-screen="screen-quiz-setup">
+        <span class="emoji">📝</span>
+        <div class="title">Trắc nghiệm</div>
+        <div class="desc">Luyện từ vựng nhanh</div>
+      </div>
+      <div class="module-tile" data-screen="screen-grammar-topics">
+        <span class="emoji">🧩</span>
+        <div class="title">Ngữ pháp</div>
+        <div class="desc">Lý thuyết + bài tập</div>
+      </div>
+      <div class="module-tile" data-screen="screen-mocktest-intro">
+        <span class="emoji">🏁</span>
+        <div class="title">Mock Test</div>
+        <div class="desc">Thi thử tính band điểm</div>
+      </div>
+      <div class="module-tile" data-screen="screen-writing">
+        <span class="emoji">✍️</span>
+        <div class="title">Writing</div>
+        <div class="desc">Đề bài + tips</div>
+      </div>
+      <div class="module-tile" data-screen="screen-speaking">
+        <span class="emoji">🗣️</span>
+        <div class="title">Speaking</div>
+        <div class="desc">Đề bài + tips</div>
+      </div>
+      <div class="module-tile" data-screen="screen-saved">
+        <span class="emoji">💾</span>
+        <div class="title">Đã lưu</div>
+        <div class="desc" id="savedCountDesc">0 mục đã lưu</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SAVED / BOOKMARKS ============ -->
+  <section id="screen-saved" class="screen hidden">
+    <div class="card">
+      <h2 style="color:var(--primary)">💾 Đã lưu</h2>
+      <p style="color:var(--text-light); font-size:13px;">Nhấn biểu tượng ⭐ trên flashcard để lưu từ vào đây.</p>
+    </div>
+    <div id="savedList"></div>
+  </section>
+
+  <!-- ============ VOCAB: topic list ============ -->
+  <section id="screen-vocab-topics" class="screen hidden">
+    <div class="card">
+      <h2 style="color:var(--primary)">📖 Chọn chủ đề từ vựng</h2>
+    </div>
+    <div id="vocabTopicList"></div>
+  </section>
+
+  <!-- ============ VOCAB: flashcards ============ -->
+  <section id="screen-vocab-flashcards" class="screen hidden">
+    <button class="btn btn-outline btn-sm" data-back="screen-vocab-topics">← Quay lại</button>
+    <div id="flashcardArea" class="mt-16"></div>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button class="btn btn-outline" id="vocabTypingBtn">⌨️ Luyện gõ</button>
+      <button class="btn btn-outline" id="vocabMatchBtn">🎮 Nối từ</button>
+    </div>
+  </section>
+
+  <!-- ============ VOCAB: typing practice ============ -->
+  <section id="screen-typing" class="screen hidden">
+    <button class="btn btn-outline btn-sm" data-back="screen-vocab-flashcards">← Quay lại</button>
+    <div class="card mt-16">
+      <h2 style="color:var(--primary)">⌨️ Luyện gõ từ vựng</h2>
+      <div class="typing-target" id="typingMeaning"></div>
+      <input type="text" class="typing-input" id="typingInput" autocomplete="off" placeholder="Gõ từ tiếng Anh...">
+    </div>
+  </section>
+
+  <!-- ============ VOCAB: matching game ============ -->
+  <section id="screen-match" class="screen hidden">
+    <button class="btn btn-outline btn-sm" data-back="screen-vocab-flashcards">← Quay lại</button>
+    <div class="card mt-16">
+      <h2 style="color:var(--primary); text-align:center;">🎮 Game Nối Từ</h2>
+      <div class="match-grid mt-16" id="matchGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ setup + run ============ -->
+  <section id="screen-quiz-setup" class="screen hidden">
+    <div class="card">
+      <h2 style="color:var(--primary)">📝 Trắc nghiệm</h2>
+      <p>Trả lời các câu hỏi trắc nghiệm để ôn từ vựng.</p>
+      <button class="btn btn-primary mt-16" id="quizStartBtn">Bắt đầu</button>
+    </div>
+  </section>
+  <section id="screen-quiz-run" class="screen hidden">
+    <div class="card">
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="option-list" id="quizOptions"></div>
+    </div>
+  </section>
+  <section id="screen-quiz-result" class="screen hidden">
+    <div class="card text-center">
+      <h2 style="color:var(--success)">🎉 Kết quả</h2>
+      <div class="result-band" id="quizScore"></div>
+      <button class="btn btn-primary mt-16" data-back="screen-home">Về trang chủ</button>
+    </div>
+  </section>
+
+  <!-- ============ GRAMMAR ============ -->
+  <section id="screen-grammar-topics" class="screen hidden">
+    <div class="card">
+      <h2 style="color:var(--primary)">🧩 Ngữ pháp IELTS</h2>
+    </div>
+    <div id="grammarTopicList"></div>
+  </section>
+  <section id="screen-grammar-theory" class="screen hidden">
+    <button class="btn btn-outline btn-sm" data-back="screen-grammar-topics">← Quay lại</button>
+    <div class="card mt-16">
+      <h2 id="grammarTheoryTitle" style="color:var(--primary)"></h2>
+      <p id="grammarTheoryText"></p>
+      <button class="btn btn-primary mt-16" id="grammarExerciseBtn">Làm bài tập</button>
+    </div>
+  </section>
+  <section id="screen-grammar-quiz" class="screen hidden">
+    <div class="card">
+      <div class="quiz-question" id="grammarQuestion"></div>
+      <div class="option-list" id="grammarOptions"></div>
+    </div>
+  </section>
+  <section id="screen-grammar-result" class="screen hidden">
+    <div class="card text-center">
+      <h2 style="color:var(--success)">🎉 Hoàn thành!</h2>
+      <div class="result-band" id="grammarScore"></div>
+      <button class="btn btn-primary mt-16" data-back="screen-home">Về trang chủ</button>
+    </div>
+  </section>
+
+  <!-- ============ MOCK TEST ============ -->
+  <section id="screen-mocktest-intro" class="screen hidden">
+    <div class="card">
+      <h2 style="color:var(--danger)">🏁 IELTS Mock Test</h2>
+      <p>Gồm phần Reading và Listening, chấm điểm theo thang band 0-9.</p>
+      <button class="btn btn-primary mt-16" id="mockStartBtn">Bắt đầu thi</button>
+    </div>
+  </section>
+  <section id="screen-mocktest-run" class="screen hidden">
+    <div class="card">
+      <div class="chip" id="mockSectionLabel"></div>
+      <p id="mockPassage" class="mt-8" style="color:var(--text-light); font-size:14px;"></p>
+      <div class="quiz-question" id="mockQuestion"></div>
+      <div class="option-list" id="mockOptions"></div>
+    </div>
+  </section>
+  <section id="screen-mocktest-result" class="screen hidden">
+    <div class="card text-center">
+      <h2 style="color:var(--text-main)">Hoàn thành!</h2>
+      <div class="result-band" id="mockBand"></div>
+      <div class="result-stat-row">
+        <div class="result-stat"><div class="num" id="mockCorrect"></div><div class="label">Đúng</div></div>
+        <div class="result-stat"><div class="num" id="mockTotal"></div><div class="label">Tổng câu</div></div>
+      </div>
+      <button class="btn btn-primary mt-16" data-back="screen-home">Về trang chủ</button>
+    </div>
+  </section>
+
+  <!-- ============ WRITING / SPEAKING ============ -->
+  <section id="screen-writing" class="screen hidden">
+    <div class="card"><h2 style="color:var(--primary)">✍️ Writing</h2></div>
+    <div id="writingList"></div>
+  </section>
+  <section id="screen-speaking" class="screen hidden">
+    <div class="card"><h2 style="color:var(--primary)">🗣️ Speaking</h2></div>
+    <div id="speakingList"></div>
+  </section>
+
+  <!-- ============ ACHIEVEMENTS / PROFILE ============ -->
+  <section id="screen-achievements" class="screen hidden">
+    <div class="card">
+      <h2 style="color:var(--primary)">🏆 Hồ sơ thành tích</h2>
+      <div class="result-stat-row mt-16" id="achieveStats"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:8px;">Huy hiệu</h3>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:8px;">📚 Từ vựng vừa học</h3>
+      <div id="recentWordsList"></div>
+    </div>
+  </section>
+
+  <!-- ============ ONBOARDING ============ -->
+  <div id="onboardingOverlay" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="card" style="max-width:400px;">
+      <h2 style="color:var(--primary)">Chào mừng! 👋</h2>
+      <p>IELTS Buddy giúp bạn học từ vựng, ngữ pháp và luyện thi IELTS mỗi ngày qua các mini-game vui nhộn. Tiến trình được lưu ngay trên máy của bạn.</p>
+      <button class="btn btn-primary mt-16" id="onboardingCloseBtn">Bắt đầu học!</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-nav">
+  <button class="footer-nav-btn active" data-screen="screen-home"><span class="emoji">🏠</span>Trang chủ <span id="footerProgressText"></span></button>
+  <button class="footer-nav-btn" data-screen="screen-vocab-topics"><span class="emoji">📖</span>Từ vựng</button>
+  <button class="footer-nav-btn" data-screen="screen-mocktest-intro"><span class="emoji">🏁</span>Mock Test</button>
+  <button class="footer-nav-btn" data-screen="screen-achievements"><span class="emoji">🏆</span>Thành tích</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+<script src="js/data.js?v=2"></script>
+<script src="js/storage.js?v=2"></script>
+<script src="js/vocab.js?v=2"></script>
+<script src="js/grammar.js?v=2"></script>
+<script src="js/mocktest.js?v=2"></script>
+<script src="js/achievements.js?v=2"></script>
+<script src="js/bookmarks.js?v=2"></script>
+<script src="js/search.js?v=2"></script>
+<script src="js/dailyquest.js?v=2"></script>
+<script src="js/app.js?v=2"></script>
+<script>
+  // module-tile clicks route through App.showScreen
+  document.addEventListener('click', (e) => {
+    const tile = e.target.closest('[data-screen]');
+    if (tile && !tile.classList.contains('footer-nav-btn')) App.showScreen(tile.dataset.screen);
+  });
+</script>
+</body>
+</html>
